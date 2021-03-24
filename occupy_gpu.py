@@ -8,9 +8,7 @@ gpu_train.py
 import argparse, logging
 import torch
 import time
-import setproctitle
 
-setproctitle.setproctitle("gpu_train")
 
 def main():
     parser = argparse.ArgumentParser()
@@ -53,7 +51,7 @@ def main():
     while True:
         time.sleep(0.01)
         for _ in range(int(10 * args.usage)):
-            torch.logit(x)
+            torch.sin(x)
         if args.time > 0 and time.time() - start_time > args.time:
             break
         
