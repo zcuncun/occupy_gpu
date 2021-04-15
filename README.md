@@ -1,2 +1,2 @@
 # occupy_gpu
-暂时占用GPU
+For better usage of GPU
