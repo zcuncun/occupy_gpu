@@ -1,65 +1,76 @@
 #! /usr/bin/python
 # -*- coding: utf-8 -*-
 # Create by zcuncun @ 2021/03/18 11:08:26
-"""
+'''
 gpu_train.py
-"""
+'''
 
 import argparse, logging
 import torch
 import time
+import random
 
 
 def main():
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
-        "--device",
+        '--device',
         type=str,
         required=True,
-        help="device",
+        help='device',
     )
 
     parser.add_argument(
-        "--time",
+        '--time',
         type=int,
         required=True,
-        help="运行时间",
+        help='运行时间',
     )
 
     parser.add_argument(
-        "--size",
+        '--gpu_mem',
         default=1,
         type=int,
-        help="显存占用大小",
+        help='显存占用大小',
     )
 
     parser.add_argument(
-        "--usage",
+        '--cpu_mem',
         default=1,
-        type=float,
-        help="使用率",
+        type=int,
+        help='显存占用大小',
+    )
+
+
+    parser.add_argument(
+        '--usage',
+        default=6,
+        type=int,
+        help='使用率',
     )
 
     args = parser.parse_args()
 
-    train_device = "cuda:{}".format(args.device)
-    start_time = time.time()
-    sleep_time = 0
+    train_device = 'cuda:{}'.format(args.device)
     gpu_run = torch.rand([64, 3, 512, 512], device=train_device)
-    gpu_mem = torch.rand([args.size*128 * 512 * 512], device=train_device)
-    cpu_run = torch.rand([8, 3, 512, 512], device="cpu")
-    cpu_mem = torch.rand([args.size*128 * 512 * 512], device="cpu")
-    
+    gpu_mem = torch.rand([(args.gpu_mem - 1) * (1 << 28)], device=train_device)
+    cpu_run = torch.rand([8, 3, 256, 256], device='cpu')
+    cpu_mem = torch.rand([args.cpu_mem * (1 << 28)], device='cpu')
+    start_time = time.time()
+    t = random.randint(10, 20)
     while True:
         t0 = time.time()
         a = 0
-        while (time.time() - t0) < 0.003 * (2 / ( 1 + 2 * args.usage)):
+        while time.time() - t0 < (t - 2):
+            time.sleep(0.01)
+            for i in range(args.usage):
+                torch.sin(gpu_run)
+        while time.time() - t0 < t:
             a = 1
-        torch.sin(gpu_run)
         if args.time > 0 and time.time() - start_time > args.time:
             break
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
