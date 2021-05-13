@@ -46,18 +46,20 @@ def main():
     train_device = "cuda:{}".format(args.device)
     start_time = time.time()
     sleep_time = 0
-    x = torch.rand([64, 3, 512, 512], device=train_device)
-    y = torch.rand([args.size*128, 3, 512, 512], device=train_device)
+    gpu_run = torch.rand([64, 3, 512, 512], device=train_device)
+    gpu_mem = torch.rand([args.size*128 * 512 * 512], device=train_device)
+    cpu_run = torch.rand([8, 3, 512, 512], device="cpu")
+    cpu_mem = torch.rand([args.size*128 * 512 * 512], device="cpu")
+    
     while True:
-        time.sleep(0.01)
-        for _ in range(int(10 * args.usage)):
-            torch.sin(x)
+        t0 = time.time()
+        a = 0
+        while (time.time() - t0) < 0.003 * (2 / ( 1 + 2 * args.usage)):
+            a = 1
+        torch.sin(gpu_run)
         if args.time > 0 and time.time() - start_time > args.time:
             break
-        
 
-        
-        
 
 if __name__ == "__main__":
     main()
